@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Alexa skills</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<div class="nav">
+		<div>
+			<div id="skill" class="button active1" >Skill</div>
+			<div id="intent" class="button" >Intents &nbsp</div>
+			<div id="slot" class="button" >slot &nbsp</div>
+			<div id="value" class="button" >type</div>
+			<div id="fullGraph" class="button" >Toggle full graph</div>
+			<div id="fullScreen" class="button" onclick="openRightView()">Toggle full screen</div>
+		</div>
+		<div id="level">
+			<div id="skill" class="button active2"  onclick="changeLevel(this,1)">Skill</div>
+			<div>-></div>
+			<div id="intent" class="button"  onclick="changeLevel(this,2)">Intent</div>
+			<div>-></div>
+			<div id="slot" class="button"  onclick="changeLevel(this,3)">Slot</div>
+			<div>-></div>
+			<div id="type" class="button"  onclick="changeLevel(this,4)">type</div>
+		</div>
+	</div>
+	<canvas></canvas>
+
+	<div class="rightView"></div>
+
+	<script src="script.js"></script>
+</body>
+</html>
