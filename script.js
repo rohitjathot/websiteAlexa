@@ -22,6 +22,7 @@ var HEIGHT = canvas.height;
 var objectTodraw = "skill";
 var showFullGraph = false;
 var distanceThresold = 300;
+var currentSelectedObject = null; //TO-DO ///////////////////////////////////////////
 
 //Buttons for diffrent level objects
 var skillButton = document.getElementById('skill');
@@ -192,7 +193,6 @@ function myDown(e) {
     for (var i = 0; i < rects.length; i++) {
         var r = rects[i];
         if (mx > r.x && mx < r.x + r.width && my > r.y && my < r.y + r.height && (r.level-level==0 || r.level-level==1)) {
-            // if yes, set that rects isDragging=true
             dragok = true;
             r.isDragging = true;
             break;
@@ -202,7 +202,6 @@ function myDown(e) {
     for (var i = 0; i < circles.length; i++) {
         var r = circles[i];
         if (mx > r.x - r.radius && mx < r.x + r.radius && my > r.y - r.radius && my < r.y + r.radius && (r.level-level==0 || r.level-level==1)) {
-            // if yes, set that circles isDragging=true
             dragok = true;
             r.isDragging = true;
             break;
@@ -365,8 +364,10 @@ function openRightView() {
     console.log(width);
     if(width!=='0%'){
     	rightView[0].style.width = '0%';
+    	rightView[0].style.padding = '0%';
     }else{
     	rightView[0].style.width = '30%';
+    	rightView[0].style.padding = '2%';
     }
 }
 

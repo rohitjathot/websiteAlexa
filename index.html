@@ -26,7 +26,26 @@
 	</div>
 	<canvas></canvas>
 
-	<div class="rightView"></div>
+	<div class="rightView">
+		<div id="title">Skill</div>
+	  	<div class="group">
+	    	<input type="text" id="name" required="required"/>
+	    	<label for="name">Name</label>
+	    	<div class="bar"></div>
+	  	</div>
+
+    	<div class="group hidden">
+			<input type="text" id="utterances"  required="required">
+			<label for="utterances">Type Utterances</label>
+			<div class="bar"></div>
+		</div>
+
+		<div class="group hidden">
+			<input type="text" id="Type"  required="required">
+			<label for="Type">Type of slot</label>
+			<div class="bar"></div>
+		</div>
+	</div>
 
 	<script src="script.js"></script>
 </body>
