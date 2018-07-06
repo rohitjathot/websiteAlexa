@@ -49,6 +49,17 @@ var rects = [];
 var circles = [];
 var lines = [];
 
+//this is very basic JSON file structure for Alexa skills
+var json = {
+	"interactionModel":{
+		"languageModel":{
+			"invocationName": "Undefined",
+			"intents": [],
+			"types": []
+		}
+	}
+}
+
 // listen for mouse events
 canvas.onmousedown = myDown;
 canvas.onmouseup = myUp;
@@ -97,13 +108,15 @@ function addCircle(fill,x,y,r,sAngle,eAngle,dragingNow,level = 1,line = null,lin
 }
 
 //add circle
-function addLines(cx,cy,rx,ry,level = 1) {
+function addLines(cx,cy,rx,ry,level = 1,from,to) {
 	lines.push({
 	    cx: cx,
 	    cy: cy,
 	    rx: rx,
 	    ry: ry,
-	    level:level
+	    level:level,
+	    from:from,
+	    to:to
 	});	
 }
 
@@ -142,26 +155,6 @@ function Lines(cx,cy,rx,ry) {
 	ctx.moveTo(cx,cy);
 	ctx.lineTo(rx,ry);
 	ctx.stroke();
-}
-
-function createObjects(object,x,y) {
-	switch(object){
-		case "skill":
-			if(level==1)
-				addCircle("#0c64e8",x,y,60,0,Math.PI*2,true,1);
-			break;
-		case "intent":
-			if(level==1 || level==2)
-				addRec("#0c64e8",x,y,60,60,true,2);
-			break;
-		case "slots":
-			if(level==2 || level==3)
-				addCircle("#fff",x,y,60,0,Math.PI*2,true,3);
-		case "value":
-    		if(level==3 || level==4)
-    			addRec("#0c64e8",x,y,60,60,true,4);
-	}
-    dragok = true;
 }
 
 // clear the canvas
@@ -312,7 +305,29 @@ function myMove(e) {
     }
 }
 
-//adding lines from circle to square when they are sufficienly near to each other else remove them
+//creates object of selected type
+function createObjects(object,x,y) {
+	switch(object){
+		case "skill":
+			if(level==1)
+				addCircle("#0c64e8",x,y,60,0,Math.PI*2,true,1);
+			break;
+		case "intent":
+			if(level==1 || level==2)
+				addRec("#0c64e8",x,y,60,60,true,2);
+			break;
+		case "slots":
+			if(level==2 || level==3)
+				addCircle("#fff",x,y,60,0,Math.PI*2,true,3);
+		case "value":
+    		if(level==3 || level==4)
+    			addRec("#0cf4f8",x,y,60,60,true,4);
+	}
+    dragok = true;
+}
+
+//adding lines from circle to square when they are 
+//sufficienly near to each other else remove them
 function joinObjects(objWithMoreEdge,objWithOneEdge) {
 	for (var i = 0; i < objWithMoreEdge.length; i++) {
 		for (var j = 0; j < objWithOneEdge.length; j++) {
@@ -321,7 +336,7 @@ function joinObjects(objWithMoreEdge,objWithOneEdge) {
 			}
 			var distanceBetObj = distance(objWithMoreEdge[i].x,objWithMoreEdge[i].y,objWithOneEdge[j].x,objWithOneEdge[j].y);
 			if(distanceBetObj<distanceThresold && !objWithOneEdge[j].hasLine){
-				addLines(objWithMoreEdge[i].x+objWithMoreEdge[i].width/2,objWithMoreEdge[i].y+objWithMoreEdge[i].height/2,objWithOneEdge[j].x+objWithOneEdge[j].width/2,objWithOneEdge[j].y+objWithOneEdge[j].height/2,level);
+				addLines(objWithMoreEdge[i].x+objWithMoreEdge[i].width/2,objWithMoreEdge[i].y+objWithMoreEdge[i].height/2,objWithOneEdge[j].x+objWithOneEdge[j].width/2,objWithOneEdge[j].y+objWithOneEdge[j].height/2,level,objWithMoreEdge[i],objWithOneEdge[j]);
 				objWithMoreEdge[i].lines.push(lines[lines.length-1]);
 				objWithOneEdge[j].line = lines[lines.length-1];
 				objWithMoreEdge[i].hasLine = true;
@@ -369,6 +384,8 @@ function removeLines(listOfLinesToRemove,firstObject,secondObject) {
 	}
 }
 
+
+//opne right side panel which has information such as name
 function openRightView() {
     var width = rightView[0].style.width;
     if(width!=='0%'){
@@ -455,10 +472,12 @@ function saveDetails() {
     }
 }
 
+//calculates distance between two objects
 function distance(cx,cy,rx,ry) {
 	return Math.sqrt(Math.pow(cx-rx,2)+Math.pow(cy-ry,2));
 }
 
+// selects object to draw and highlights current selected button
 skillButton.onclick = function() {
     objectTodraw = "skill";
     var current = document.getElementsByClassName("active1");
@@ -487,6 +506,7 @@ typeButton.onclick = function() {
     this.className += " active1";
 };
 
+//show every node and edge of graph
 fullGraph.onclick = function(){
 	showFullGraph = !showFullGraph;
     var current = document.getElementsByClassName("active1");
@@ -495,10 +515,41 @@ fullGraph.onclick = function(){
 	draw();
 }
 
+//This function calls when we select any object to draw
+//changes current object level
 function changeLevel(context,newLevel) {
 	level = newLevel;
     var current = document.getElementsByClassName("active2");
     current[0].className = current[0].className.replace(" active2", "");
     context.className += " active2";
 	draw();
+}
+
+function buildJSON() {
+	var modal = document.getElementById("modal");
+	// var jsonToDisplay = JSON.parse(json);
+	// var tabs = "&nbsp";
+	document.getElementById("JSON_Container").innerHTML = JSON.stringify(json, null, '\t');;
+
+
+	// for (var i = 0; i < jsonToDisplay.length; i++) {
+	// 	if(jsonToDisplay[i]=='{' || jsonToDisplay[i]=='[' || jsonToDisplay[i]==','){
+	// 		document.getElementById("JSON_Container").innerHTML += jsonToDisplay[i]+"<br><br>"+tabs+tabs;
+	// 		tabs+="&nbsp";	
+	// 	}else{
+	// 		if(jsonToDisplay[i]=='}' || jsonToDisplay[i]==']'){
+	// 			document.getElementById("JSON_Container").innerHTML += "<br>"+tabs+tabs+jsonToDisplay[i];
+	// 			tabs = tabs.substring(0,tabs.lenght-4);
+	// 			console.log(tabs.Lenght+" : Lenght of tabs");
+	// 		}else{
+	// 			document.getElementById("JSON_Container").innerHTML += jsonToDisplay[i];
+	// 		}
+	// 	}
+	// }
+
+	if(modal.className.indexOf("hidden")>-1)
+		document.getElementById("modal").className = document.getElementById("modal").className.replace(" hidden","");
+	else
+		document.getElementById("modal").className += " hidden";
+	console.log(modal);
 }

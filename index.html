@@ -13,6 +13,7 @@
 			<div id="value" class="button" >type</div>
 			<div id="fullGraph" class="button" >Toggle full graph</div>
 			<div id="fullScreen" class="button" onclick="openRightView()">Toggle full screen</div>
+			<div id="createJson" class="button" onclick="buildJSON()">Build JSON</div>
 		</div>
 		<div id="level">
 			<div id="skill" class="button active2"  onclick="changeLevel(this,1)">Skill</div>
@@ -50,6 +51,10 @@
 			<div class="bar"></div>
 		</div>
 		<div id="type" class="button" onclick="saveDetails()">Save</div>
+	</div>
+
+	<div id="modal" class=" hidden">
+		<pre id="JSON_Container" style="padding-top: 2%;font-size: 25px;color: white;text-align: left;"></pre>
 	</div>
 
 	<script src="script.js"></script>
