@@ -65,12 +65,17 @@ canvas{
 }
 
 .hidden{
-	visibility: hidden;
+	display: none;
 }
 
-#title{
+#object_title{
 	color: rgba(255, 255, 255 , 0.8);
 	font: 700 40px Roboto;
+}
+
+#utterance_list{
+	color: rgba(255, 255, 255 , 0.8);
+	font: 500 30px Roboto;	
 }
 
 .group {

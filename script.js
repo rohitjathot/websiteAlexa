@@ -3,9 +3,9 @@
 
 //need to save states of graphs at each level
 //add delete button
-//identify each node
+//identify each node :DONE
 
-//slot type must be created before using them
+//slot type graph must be created before creating JSON
 
 var level = 1;
 
@@ -22,7 +22,7 @@ var HEIGHT = canvas.height;
 var objectTodraw = "skill";
 var showFullGraph = false;
 var distanceThresold = 300;
-var currentSelectedObject = null; //TO-DO ///////////////////////////////////////////
+var currentSelectedObject = null;
 
 //Buttons for diffrent level objects
 var skillButton = document.getElementById('skill');
@@ -70,7 +70,8 @@ function addRec(fill,x,y,w,h,dragingNow,level = 1,line = null,lines = []) {
 	    line:line,
 	    lines:lines,
 	    level:level,
-	    name:"Undefined"
+	    name:"Undefined",
+	    utterances:[]
 	});	
 }
 
@@ -90,7 +91,8 @@ function addCircle(fill,x,y,r,sAngle,eAngle,dragingNow,level = 1,line = null,lin
 	    line:line,
 	    lines:lines,
 	    level:level,
-	    name:"Undefined"
+	    name:"Undefined",
+	    slot:"Undefined"
 	});	
 }
 
@@ -142,6 +144,26 @@ function Lines(cx,cy,rx,ry) {
 	ctx.stroke();
 }
 
+function createObjects(object,x,y) {
+	switch(object){
+		case "skill":
+			if(level==1)
+				addCircle("#0c64e8",x,y,60,0,Math.PI*2,true,1);
+			break;
+		case "intent":
+			if(level==1 || level==2)
+				addRec("#0c64e8",x,y,60,60,true,2);
+			break;
+		case "slots":
+			if(level==2 || level==3)
+				addCircle("#fff",x,y,60,0,Math.PI*2,true,3);
+		case "value":
+    		if(level==3 || level==4)
+    			addRec("#0c64e8",x,y,60,60,true,4);
+	}
+    dragok = true;
+}
+
 // clear the canvas
 function clear() {
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
@@ -190,47 +212,35 @@ function myDown(e) {
 
     // test each rect to see if mouse is inside
     dragok = false;
-    for (var i = 0; i < rects.length; i++) {
+    for (var i = rects.length-1; i>=0; i--) {
         var r = rects[i];
         if (mx > r.x && mx < r.x + r.width && my > r.y && my < r.y + r.height && (r.level-level==0 || r.level-level==1)) {
             dragok = true;
             r.isDragging = true;
+            currentSelectedObject = r;
             break;
         }
     }
 
-    for (var i = 0; i < circles.length; i++) {
+    for (var i = circles.length-1; i>=0; i--) {
         var r = circles[i];
         if (mx > r.x - r.radius && mx < r.x + r.radius && my > r.y - r.radius && my < r.y + r.radius && (r.level-level==0 || r.level-level==1)) {
             dragok = true;
             r.isDragging = true;
+            currentSelectedObject = r;
             break;
         }
     }
 
     if(!dragok){
-    	switch(objectTodraw){
-    		case "skill":
-    			if(level==1)
-    				addCircle("#0c64e8",mx,my,60,0,Math.PI*2,true,1);
-    			break;
-    		case "intent":
-    			if(level==1 || level==2)
-    				addRec("#0c64e8",mx,my,60,60,true,2);
-    			break;
-    		case "slots":
-    			if(level==2 || level==3)
-    				addCircle("#fff",mx,my,60,0,Math.PI*2,true,3);
-    		case "value":
-	    		if(level==3 || level==4)
-	    			addRec("#0c64e8",mx,my,60,60,true,4);
-    	}
-	    dragok = true;
-	    draw();
+    	createObjects(objectTodraw,mx,my);
     }
     // save the current mouse position
     startX = mx;
     startY = my;
+
+    updateRightPanel();
+    draw();
 }
 
 
@@ -361,13 +371,87 @@ function removeLines(listOfLinesToRemove,firstObject,secondObject) {
 
 function openRightView() {
     var width = rightView[0].style.width;
-    console.log(width);
     if(width!=='0%'){
     	rightView[0].style.width = '0%';
     	rightView[0].style.padding = '0%';
     }else{
     	rightView[0].style.width = '30%';
     	rightView[0].style.padding = '2%';
+    }
+}
+
+//this will add some fields and remove some fields according to object selected
+function updateRightPanel() {
+	//checking if objected is selected
+	if(currentSelectedObject){
+		var utterance = document.getElementById("utterances").className;
+		var slots = document.getElementById("slots").className;
+		console.log(currentSelectedObject.level);
+		switch(currentSelectedObject.level){
+			case 1:
+				console.log("changing title to skill");
+				if(utterance.indexOf("hidden")==-1){
+					document.getElementById("utterances").className += " hidden";
+					document.getElementById("utterance_list").className += " hidden";
+				}
+				if(slots.indexOf("hidden")==-1)
+					document.getElementById("slots").className += " hidden";
+				document.getElementById("object_title").innerHTML = "Skill";
+				break;
+			case 2:
+				if(slots.indexOf("hidden")==-1)
+					document.getElementById("slots").className += " hidden";
+				document.getElementById("utterances").className = document.getElementById("utterances").className.replace(" hidden","");
+				document.getElementById("utterance_list").className = document.getElementById("utterance_list").className.replace(" hidden","");
+				document.getElementById("utterance_list").innerHTML = "";
+				for (var i = 0; i < currentSelectedObject.utterances.length; i++) {
+					document.getElementById("utterance_list").innerHTML += currentSelectedObject.utterances[i]+"<br>";
+				} //NEED TO OPTIMIZE IT .. can be done by refresing one item per update not whole list
+				
+				document.getElementById("object_title").innerHTML = "Intent";
+				break;
+			case 3:
+				if(utterance.indexOf("hidden")==-1){
+					document.getElementById("utterances").className += " hidden";
+					document.getElementById("utterance_list").className += " hidden";
+				}
+				document.getElementById("slots").className = document.getElementById("slots").className.replace(" hidden","");
+				document.getElementById("slot_name").value = currentSelectedObject.slot;
+    			console.log(document.getElementById("slot_name"));
+    			document.getElementById("object_title").innerHTML = "Slot";
+				break;
+			case 4:
+				if(utterance.indexOf("hidden")==-1){
+					document.getElementById("utterances").className += " hidden";
+					document.getElementById("utterance_list").className += " hidden";
+				}
+				if(slots.indexOf("hidden")==-1)
+					document.getElementById("slots").className += " hidden";
+				document.getElementById("object_title").innerHTML = "Type of slot";
+				break;
+		}
+    	document.getElementById('name').value = currentSelectedObject.name;
+    }
+}
+
+function saveDetails() {
+	if(currentSelectedObject){
+    	 currentSelectedObject.name = document.getElementById('name').value;
+    	 switch(currentSelectedObject.level){
+    	 	case 2:
+	    	 	if(document.getElementById('utterance').value!=="")
+	    	 		currentSelectedObject.utterances.push(document.getElementById('utterance').value);
+    	 		document.getElementById('utterance').value = "";
+    	 		break;
+    	 	case 3:
+    	 		currentSelectedObject.slot = document.getElementById('slot_name').value;
+    	 		break;
+    	 	case 4:
+    	 		break;
+    	 }
+    	 updateRightPanel();
+    }else{
+    	alert("First select object to save details");
     }
 }
 

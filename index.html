@@ -24,27 +24,32 @@
 			<div id="type" class="button"  onclick="changeLevel(this,4)">type</div>
 		</div>
 	</div>
+	<!-- We draw everything in canvas -->
 	<canvas></canvas>
 
 	<div class="rightView">
-		<div id="title">Skill</div>
+		<div id="object_title">Skill</div>
 	  	<div class="group">
 	    	<input type="text" id="name" required="required"/>
 	    	<label for="name">Name</label>
 	    	<div class="bar"></div>
 	  	</div>
 
-    	<div class="group hidden">
-			<input type="text" id="utterances"  required="required">
-			<label for="utterances">Type Utterances</label>
+    	<div class="group hidden" id="utterances">
+			<input type="text" id="utterance"  required="required">
+			<label for="utterance">Type Utterances</label>
 			<div class="bar"></div>
+			<br>
 		</div>
+		
+		<div id="utterance_list" class=" hidden"></div>
 
-		<div class="group hidden">
-			<input type="text" id="Type"  required="required">
-			<label for="Type">Type of slot</label>
+		<div class="group hidden" id="slots">
+			<input type="text" id="slot_name"  required="required">
+			<label for="slot_name">Type of slot</label>
 			<div class="bar"></div>
 		</div>
+		<div id="type" class="button" onclick="saveDetails()">Save</div>
 	</div>
 
 	<script src="script.js"></script>
